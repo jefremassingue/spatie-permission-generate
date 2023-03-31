@@ -1,0 +1,46 @@
+{
+    "name": "jefremassingue/spatie-permission-generate",
+    "description": "Package for genarate permissions",
+    "keywords": [
+        "jefremassingue",
+        "spatie-permission",
+        "generate"
+    ],
+    "type": "library",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "homepage": "https://github.com/jefremassingue/spatie-permission-generate",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Jefre\\SpatiePermissionGenerate\\": "src/"
+        },
+        "files": [
+            "src/SpatiePermissionGenerate.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Jefre Massingue",
+            "email": "jefremassingue.jm@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.3",
+        "spatie/laravel-permission": "^5.10"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jefre\\SpatiePermissionGenerate\\Providers\\ServiceProvider"
+            ],
+            "aliases": {
+                "SpatiePermissionGenerate": "Jefre\\SpatiePermissionGenerate\\Providers\\ServiceProvider\\Facade"
+            }
+        }
+    }
+}
