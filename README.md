@@ -27,8 +27,8 @@ composer require jefremassingue/spatie-permission-generate
 ``` php
 // Set the keys in your .env file
 
-SPG_CONTROLLERS_ROOT_PATH', 'app/Http/Controllers',
-SPG_IGNORE_CLASSES_FILES', 'Controller, Other classes you want ignore'
+SPG_CONTROLLERS_ROOT_PATH='app/Http/Controllers',
+SPG_IGNORE_CLASSES_FILES='Controller, Other classes you want ignore'
 ```
 
 ### Testing
