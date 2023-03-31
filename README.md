@@ -20,7 +20,7 @@ composer require jefremassingue/spatie-permission-generate
 ## Usage
 
 ``` php
-// Set the api and public key as follows . Copy it from Mpesa Developer Console (https://developer.mpesa.vm.co.mz/) .
+// Run synchronizelPermission method to generate permissions
     $hasGenarate = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
 
 ```
