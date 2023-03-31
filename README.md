@@ -1,4 +1,4 @@
-# Mpesa Mozambique PHP SDK
+# Spatie Permission Generate
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/karson/mpesa-php-sdk.svg?style=flat-square)](https://packagist.org/packages/karson/mpesa-php-sdk)
 [![Build Status](https://img.shields.io/travis/karson/mpesa-php-sdk/master.svg?style=flat-square)](https://travis-ci.org/karson/mpesa-php-sdk)
@@ -53,7 +53,7 @@ If you discover any security related issues, please email karson@turbohost.co in
 
 ## Credits
 
-- [Karson Adam](https://github.com/karson)
+- [Jefre Massingue](https://github.com/jefremassingue)
 - [All Contributors](../../contributors)
 
 ## License
