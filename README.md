@@ -5,7 +5,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/karson/mpesa-php-sdk.svg?style=flat-square)](https://scrutinizer-ci.com/g/karson/mpesa-php-sdk)
 [![Total Downloads](https://img.shields.io/packagist/dt/karson/mpesa-php-sdk.svg?style=flat-square)](https://packagist.org/packages/karson/mpesa-php-sdk)
 
-This Package for genarate permissions
+Package to generate permissions from spatie/laravel-permission taking directory, controller class name and methods (ex:. Admin\UserController with index method => will have the permission `admin-user-index`)
 
 ## Installation
 
