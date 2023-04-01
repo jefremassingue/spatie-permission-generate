@@ -70,8 +70,14 @@ class SpatiePermissionGenerate{
         foreach (self::classList() as $class_item) {
 
             // $class = str_replace('App\Http\Controllers\\', '', $class_item);
-            $class = explode('\\', $class_item);
+            $path = base_path(config('spatie-permission-generate.controllers_root_path'));
+            $path = explode('/', $path);
+            $path = $path[count($path) - 1];
+
+
+            $class = explode($path . '\\', $class_item);
             $class = $class[count($class) -1];
+            // dd($class);
             // dd(!in_array($class, self::ignore_classes));
             if (
                 !in_array($class, self::$ignore_classes ?? [])
