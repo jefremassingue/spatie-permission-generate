@@ -7,10 +7,35 @@ use Spatie\Permission\Models\Permission;
 class SpatiePermissionGenerate
 {
 
+    /**
+     * Array of classes to ignore when scanning for methods.
+     *
+     * @var array
+     */
     private static $ignore_classes;
+
+    /**
+     * Array of methods and functions to ignore when scanning for methods.
+     *
+     * @var array
+     */
     private static $ignore_methods_and_functions;
+
+    /**
+     * Array of controller class suffixes to look for when scanning for methods.
+     *
+     * @var array
+     */
     private static $controller_classes_suffixes;
+
+    /**
+     * The name of the default guard.
+     *
+     * @var string
+     */
     private static $default_guard;
+
+
     public function __construct()
     {
         self::$ignore_classes = explode(",", config('spatie-permission-generate.ignore_classes_files')  ?? '');
@@ -18,7 +43,13 @@ class SpatiePermissionGenerate
         self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes')  ?? 'Controller');
         self::$default_guard =  config('spatie-permission-generate.default_guard');
     }
-    public static function synchronizelPermission()
+
+    /**
+     * Synchronize permissions for all controller classes and methods.
+     *
+     * @return bool True if synchronization was successful, false otherwise.
+     */
+    public static function synchronizelPermission(): bool
     {
         if (self::allPermission()) {
             return true;
@@ -27,6 +58,26 @@ class SpatiePermissionGenerate
         }
     }
 
+    /**
+     * Change the guard name for permissions with a given prefix.
+     *
+     * @param string $prefix The prefix of the permissions to be changed.
+     * @param string $guard  The new guard name.
+     *
+     * @return int The number of permissions that were updated.
+     */
+    public static function chanteGuardWithPrefix($prefix = 'api-', $guard = 'api')
+    {
+        return Permission::where('name', 'like', $prefix . '%')->update(['guard_name' => $guard]);
+    }
+
+
+
+     /**
+     * Returns a list of all classes found in the configured directory.
+     *
+     * @return array An array of fully-qualified class names.
+     */
     private static function classList()
     {
         // $path = __DIR__;
@@ -67,6 +118,11 @@ class SpatiePermissionGenerate
         return $fqcns;
     }
 
+    /**
+     * Synchronize permissions for all controller classes and methods.
+     *
+     * @return bool True if synchronization was successful, false otherwise.
+     */
     private static function allPermission()
     {
         $status = false;
