@@ -3,14 +3,20 @@
 namespace Jefre\SpatiePermissionGenerate;
 
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Str;
 
-class SpatiePermissionGenerate{
+class SpatiePermissionGenerate
+{
 
     private static $ignore_classes;
+    private static $ignore_methods_and_functions;
+    private static $controller_classes_suffixes;
+    private static $default_guard;
     public function __construct()
     {
         self::$ignore_classes = explode(",", config('spatie-permission-generate.ignore_classes_files')  ?? '');
+        self::$ignore_methods_and_functions = explode(",", config('spatie-permission-generate.ignore_methods_and_functions')  ?? '');
+        self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes')  ?? 'Controller');
+        self::$default_guard =  config('spatie-permission-generate.default_guard');
     }
     public static function synchronizelPermission()
     {
@@ -26,7 +32,6 @@ class SpatiePermissionGenerate{
         // $path = __DIR__;
         $path = base_path(config('spatie-permission-generate.controllers_root_path'));
         $fqcns = array();
-        // dd($path);
 
         $allFiles = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
         $phpFiles = new \RegexIterator($allFiles, '/\.php$/');
@@ -66,19 +71,19 @@ class SpatiePermissionGenerate{
     {
         $status = false;
         self::$ignore_classes = explode(",", config('spatie-permission-generate.ignore_classes_files')  ?? '');
+        self::$ignore_methods_and_functions = explode(",", config('spatie-permission-generate.ignore_methods_and_functions')  ?? '');
+        self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes')  ?? 'Controller');
+        self::$default_guard =  config('spatie-permission-generate.default_guard');
 
         foreach (self::classList() as $class_item) {
 
-            // $class = str_replace('App\Http\Controllers\\', '', $class_item);
             $path = base_path(config('spatie-permission-generate.controllers_root_path'));
             $path = explode('/', $path);
             $path = $path[count($path) - 1];
 
 
             $class = explode($path . '\\', $class_item);
-            $class = $class[count($class) -1];
-            // dd($class);
-            // dd(!in_array($class, self::ignore_classes));
+            $class = $class[count($class) - 1];
             if (
                 !in_array($class, self::$ignore_classes ?? [])
             ) {
@@ -86,22 +91,19 @@ class SpatiePermissionGenerate{
                 $methods = self::get_this_class_methods($class_item);
                 foreach ($methods as $method_name) {
                     if (
-                        '__construct' != $method_name &&
-                        'get_this_class_methods' != $method_name &&
+                        !in_array($method_name, self::$ignore_methods_and_functions) &&
                         substr($method_name, 0, 3) != "___" // Para egnorar methods que iniciam cm ___
                     ) {
+                        $class_name = '';
+                        foreach (self::$controller_classes_suffixes as $suffix) {
+                            $class_name = str_replace($suffix, '', $class);
+                        }
 
-                        $class_name = str_replace('Controllers', '', $class);
-                        $class_name = str_replace('Controller', '', $class);
-                        // echo $class_name . '-' . $method_name . "\n";
-                        // dd([$class, $class_name]);
-                        $permission_name = str_replace('Controler', '', $class_name . '-' . $method_name);
-                        $permission_name = str_replace('\\', '-', $permission_name);
-                        // dd($permission_name);
+                        $permission_name = strtolower(str_replace('\\', '-', $class_name . '-' . $method_name));
                         if (!Permission::where('name', $permission_name)->first()) {
                             $permission = Permission::create([
-                                'name' => Str::lower($permission_name),
-                                'guard_name' => 'web',
+                                'name' => $permission_name,
+                                'guard_name' => self::$default_guard,
                             ]);
                             if ($permission) {
                                 $status = true;
@@ -129,5 +131,4 @@ class SpatiePermissionGenerate{
 
         return $array3;
     }
-
 }
