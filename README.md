@@ -17,13 +17,13 @@ composer require jefremassingue/spatie-permission-generate
 Before using the package, you need to install and configure spatie/laravel-permission (https://github.com/spatie/laravel-permission).
 ``` php
 // Run synchronizelPermission method to generate permissions
-    $hasGenarate = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
+    $hasGenarate = \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
 
 ```
 
 ``` php
 // Change the guard name for permissions with a given prefix
-    $numPermissionsUpdated = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::changeGuardWithPrefix('api-', 'api');
+    $numPermissionsUpdated = \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::changeGuardWithPrefix('api-', 'api');
     
 ```
 ### Instalation in Laravel
