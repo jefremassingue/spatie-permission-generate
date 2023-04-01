@@ -66,11 +66,7 @@ class UserController extends Controller
 }
 
 ```
-<<<<<<< HEAD
-Generated permitions:
-=======
 The generated permissions would be:
->>>>>>> ce521e3f1a02725944c6ac265c8d950269f8b18f
 
 `api-user-index`
 `api-user-create`
