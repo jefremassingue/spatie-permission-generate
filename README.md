@@ -45,6 +45,8 @@ Path: /app/Http/Controllers/API/UserController.php
 ``` php
 <?php
 
+namespace App\Http\Controllers\API;
+
 ...
 
 class UserController extends Controller
