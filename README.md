@@ -39,6 +39,36 @@ SPG_IGNORE_CLASSES_FILES='Controller, Other classes you want ignore'
 composer test
 ```
 
+### Example
+Path: /app/Http/Controllers/API/UserController.php
+
+``` php
+<?php
+
+...
+
+class UserController extends Controller
+{
+    public function index(){}
+    public function create(){}
+    public function store(Request $request){}
+    public function show($id){}
+    public function edit($id){}
+    public function update(Request $request, $id){}
+    public function destroy($id){}
+}
+
+```
+Generated permitions: 
+
+`api-user-index`
+`api-user-create`
+`api-user-store`
+`api-user-show`
+`api-user-edit`
+`api-user-update`
+`api-user-destroy`
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
