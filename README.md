@@ -1,13 +1,8 @@
 # Spatie Permission Generate
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/karson/mpesa-php-sdk.svg?style=flat-square)](https://packagist.org/packages/karson/mpesa-php-sdk)
-[![Build Status](https://img.shields.io/travis/karson/mpesa-php-sdk/master.svg?style=flat-square)](https://travis-ci.org/karson/mpesa-php-sdk)
-[![Quality Score](https://img.shields.io/scrutinizer/g/karson/mpesa-php-sdk.svg?style=flat-square)](https://scrutinizer-ci.com/g/karson/mpesa-php-sdk)
-[![Total Downloads](https://img.shields.io/packagist/dt/karson/mpesa-php-sdk.svg?style=flat-square)](https://packagist.org/packages/karson/mpesa-php-sdk)
+Spatie Permission Generate is a package that generates permissions for spatie/laravel-permission based on the directory, controller class name, and methods. 
 
-Package to generate permissions from spatie/laravel-permission taking directory, controller class name and methods 
-
-ex:. Admin\UserController with index method => will have the permission `admin-user-index`)
+For instance, Admin\UserController with index method => will have the permission `admin-user-index`.
 
 ## Installation
 
@@ -18,7 +13,8 @@ composer require jefremassingue/spatie-permission-generate
 ```
 
 ## Usage
-Install and configure package spatie/laravel-permission (https://github.com/spatie/laravel-permission)
+
+Before using the package, you need to install and configure spatie/laravel-permission (https://github.com/spatie/laravel-permission).
 ``` php
 // Run synchronizelPermission method to generate permissions
     $hasGenarate = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
@@ -27,20 +23,28 @@ Install and configure package spatie/laravel-permission (https://github.com/spat
 ### Instalation in Laravel
 
 ``` php
-// Set the keys in your .env file
+// Set the following keys in your `.env` file:
 
-SPG_CONTROLLERS_ROOT_PATH='app/Http/Controllers',
-SPG_IGNORE_CLASSES_FILES='Controller, Other classes you want ignore'
+SPG_CONTROLLERS_ROOT_PATH='app/Http/Controllers'
+SPG_IGNORE_CLASSES_FILES='Controller,Helper\Upload, Other classes you want ignore'
+SPG_CONTROLLER_CLASSES_SUFFIX='Controller,_controller'
+SPG_IGNORE_METHODS_AND_FUNCTIONS='__construct'
+SPG_DEFAULT_GUARD='web'
+
 ```
+<table><thead><tr><th>Key</th><th>Description</th><th>Example</th></tr></thead><tbody><tr><td><code>SPG_CONTROLLERS_ROOT_PATH</code></td><td>The root path where the controllers are located.</td><td><code>app/Http/Controllers</code></td></tr><tr><td><code>SPG_IGNORE_CLASSES_FILES</code></td><td>The classes that should be ignored (separated by comma).</td><td><code>'Controller, Admin\PermissionGeneratorController, Helper\Upload'</code></td></tr><tr><td><code>SPG_CONTROLLER_CLASSES_SUFFIX</code></td><td>The suffixes for the controller classes.</td><td><code>'_controller, Controller, Helper\Upload'</code></td></tr><tr><td><code>SPG_IGNORE_METHODS_AND_FUNCTIONS</code></td><td>The methods and functions that should be ignored (separated by comma).</td><td><code>'__construct,pay'</code></td></tr><tr><td><code>SPG_DEFAULT_GUARD</code></td><td>The default guard.</td><td><code>'web'</code></td></tr></tbody></table>
+
 
 ### Testing
 
+To run the tests, execute the following command:
 ``` bash
 composer test
 ```
 
 ### Example
-Path: /app/Http/Controllers/API/UserController.php
+
+Consider a file located in `/app/Http/Controllers/API/UserController.php`:
 
 ``` php
 <?php
@@ -51,6 +55,7 @@ namespace App\Http\Controllers\API;
 
 class UserController extends Controller
 {
+    public function __construct() {}
     public function index(){}
     public function create(){}
     public function store(Request $request){}
@@ -61,7 +66,7 @@ class UserController extends Controller
 }
 
 ```
-Generated permitions: 
+The generated permissions would be:
 
 `api-user-index`
 `api-user-create`
