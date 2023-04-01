@@ -19,6 +19,9 @@ Before using the package, you need to install and configure spatie/laravel-permi
 // Run synchronizelPermission method to generate permissions
     $hasGenarate = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
 
+```
+
+``` php
 // Change the guard name for permissions with a given prefix
     $numPermissionsUpdated = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::changeGuardWithPrefix('api-', 'api');
     
