@@ -86,6 +86,7 @@ If you discover any security related issues, please email jefremassingue.jm@gmai
 ## Credits
 
 - [Jefre Massingue](https://github.com/jefremassingue)
+- [Abino Mateve](https://github.com/Albinomateve)
 - [All Contributors](../../contributors)
 
 ## License
