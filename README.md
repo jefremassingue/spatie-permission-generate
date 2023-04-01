@@ -18,7 +18,7 @@ composer require jefremassingue/spatie-permission-generate
 ```
 
 ## Usage
-
+Install and configure package spatie/laravel-permission (https://github.com/spatie/laravel-permission)
 ``` php
 // Run synchronizelPermission method to generate permissions
     $hasGenarate = Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
