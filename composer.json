@@ -6,6 +6,7 @@
         "spatie-permission",
         "generate"
     ],
+    "version": "1.0.0",
     "type": "library",
     "minimum-stability": "dev",
     "prefer-stable": true,
