@@ -3,10 +3,10 @@
 namespace Jefre\SpatiePermissionGenerate;
 
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Str;
 
 class SpatiePermissionGenerate
 {
-
     /**
      * Array of classes to ignore when scanning for methods.
      *
@@ -35,13 +35,20 @@ class SpatiePermissionGenerate
      */
     private static $default_guard;
 
+    /**
+     * Initialize configuration.
+     */
+    private static function initConfiguration()
+    {
+        self::$ignore_classes = explode(",", config('spatie-permission-generate.ignore_classes_files') ?? '');
+        self::$ignore_methods_and_functions = explode(",", config('spatie-permission-generate.ignore_methods_and_functions') ?? '');
+        self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes') ?? 'Controller');
+        self::$default_guard = config('spatie-permission-generate.default_guard');
+    }
 
     public function __construct()
     {
-        self::$ignore_classes = explode(",", config('spatie-permission-generate.ignore_classes_files')  ?? '');
-        self::$ignore_methods_and_functions = explode(",", config('spatie-permission-generate.ignore_methods_and_functions')  ?? '');
-        self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes')  ?? 'Controller');
-        self::$default_guard =  config('spatie-permission-generate.default_guard');
+        self::initConfiguration();
     }
 
     /**
@@ -49,13 +56,18 @@ class SpatiePermissionGenerate
      *
      * @return bool True if synchronization was successful, false otherwise.
      */
+    public static function syncPermissions(): bool
+    {
+        self::initConfiguration();
+        return self::generatePermissions();
+    }
+
+    /**
+     * @deprecated Use syncPermissions instead.
+     */
     public static function synchronizelPermission(): bool
     {
-        if (self::allPermission()) {
-            return true;
-        } else {
-            return false;
-        }
+        return self::syncPermissions();
     }
 
     /**
@@ -66,23 +78,32 @@ class SpatiePermissionGenerate
      *
      * @return int The number of permissions that were updated.
      */
-    public static function chanteGuardWithPrefix($prefix = 'api-', $guard = 'api')
+    public static function changeGuardWithPrefix($prefix = 'api-', $guard = 'api')
     {
         return Permission::where('name', 'like', $prefix . '%')->update(['guard_name' => $guard]);
     }
 
+    /**
+     * @deprecated Use changeGuardWithPrefix instead.
+     */
+    public static function chanteGuardWithPrefix($prefix = 'api-', $guard = 'api')
+    {
+        return self::changeGuardWithPrefix($prefix, $guard);
+    }
 
-
-     /**
+    /**
      * Returns a list of all classes found in the configured directory.
      *
      * @return array An array of fully-qualified class names.
      */
     private static function classList()
     {
-        // $path = __DIR__;
         $path = base_path(config('spatie-permission-generate.controllers_root_path'));
         $fqcns = array();
+
+        if (!file_exists($path)) {
+            return [];
+        }
 
         $allFiles = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
         $phpFiles = new \RegexIterator($allFiles, '/\.php$/');
@@ -100,16 +121,9 @@ class SpatiePermissionGenerate
                         $namespace .= $tokens[$index++][1];
                     }
                 }
-                if (T_CLASS === $tokens[$index][0] && T_WHITESPACE === $tokens[$index + 1][0] && T_STRING === $tokens[$index +
-                    2][0]) {
+                if (T_CLASS === $tokens[$index][0] && T_WHITESPACE === $tokens[$index + 1][0] && T_STRING === $tokens[$index + 2][0]) {
                     $index += 2; // Skip class keyword and whitespace
-                    if ($namespace != 'App\Http\Controllers\Auth') {
-                        $fqcns[] = $namespace . '\\' . $tokens[$index][1];
-                    }
-
-
-                    # break if you have one class per file (psr-4 compliant)
-                    # otherwise you'll need to handle class constants (Foo::class)
+                    $fqcns[] = $namespace . '\\' . $tokens[$index][1];
                     break;
                 }
             }
@@ -119,44 +133,50 @@ class SpatiePermissionGenerate
     }
 
     /**
-     * Synchronize permissions for all controller classes and methods.
+     * Core logic to generate permissions.
      *
      * @return bool True if synchronization was successful, false otherwise.
      */
-    private static function allPermission()
+    private static function generatePermissions()
     {
         $status = false;
-        self::$ignore_classes = explode(",", config('spatie-permission-generate.ignore_classes_files')  ?? '');
-        self::$ignore_methods_and_functions = explode(",", config('spatie-permission-generate.ignore_methods_and_functions')  ?? '');
-        self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes')  ?? 'Controller');
-        self::$default_guard =  config('spatie-permission-generate.default_guard');
+
+        $controllersRootPath = config('spatie-permission-generate.controllers_root_path');
+        // Extract the last directory name from the path to use as a delimiter
+        $pathParts = explode('/', $controllersRootPath);
+        $lastPathPart = end($pathParts);
 
         foreach (self::classList() as $class_item) {
 
-            $path = base_path(config('spatie-permission-generate.controllers_root_path'));
-            $path = explode('/', $path);
-            $path = $path[count($path) - 1];
+            // Logic to determine the relative class name for permission naming
+            // e.g. App\Http\Controllers\Api\UserController -> Api\UserController
+            // if lastPathPart is "Controllers"
 
+            $classParts = explode($lastPathPart . '\\', $class_item);
+            if (count($classParts) > 1) {
+                $classNameRelative = end($classParts);
+            } else {
+                // Fallback: use class name only if path matching fails
+                 $parts = explode('\\', $class_item);
+                 $classNameRelative = end($parts);
+            }
 
-            $class = explode($path . '\\', $class_item);
-            $class = $class[count($class) - 1];
-            if (
-                !in_array($class, self::$ignore_classes ?? [])
-            ) {
+            if (!in_array($classNameRelative, self::$ignore_classes ?? []) && !in_array($class_item, self::$ignore_classes ?? [])) {
 
                 $methods = self::get_this_class_methods($class_item);
                 foreach ($methods as $method_name) {
                     if (
                         !in_array($method_name, self::$ignore_methods_and_functions) &&
-                        substr($method_name, 0, 3) != "___" // Para egnorar methods que iniciam cm ___
+                        !Str::startsWith($method_name, '___')
                     ) {
-                        $class_name = '';
+                        $permissionGroup = $classNameRelative;
                         foreach (self::$controller_classes_suffixes as $suffix) {
-                            $class_name = str_replace($suffix, '', $class);
+                            $permissionGroup = str_replace($suffix, '', $permissionGroup);
                         }
 
-                        $permission_name = strtolower(str_replace('\\', '-', $class_name . '-' . $method_name));
-                        if (!Permission::where('name', $permission_name)->first()) {
+                        $permission_name = strtolower(str_replace('\\', '-', $permissionGroup . '-' . $method_name));
+
+                        if (!Permission::where('name', $permission_name)->exists()) {
                             $permission = Permission::create([
                                 'name' => $permission_name,
                                 'guard_name' => self::$default_guard,
@@ -177,6 +197,9 @@ class SpatiePermissionGenerate
 
     private static function get_this_class_methods($class)
     {
+        if (!class_exists($class)) {
+            return [];
+        }
         $array1 = get_class_methods($class);
         if ($parent_class = get_parent_class($class)) {
             $array2 = get_class_methods($parent_class);
