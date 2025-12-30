@@ -15,9 +15,10 @@ composer require jefremassingue/spatie-permission-generate:"dev-main"
 ## Usage
 
 Before using the package, you need to install and configure spatie/laravel-permission (https://github.com/spatie/laravel-permission).
+
 ``` php
-// Run synchronizelPermission method to generate permissions
-    $hasGenarate = \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::synchronizelPermission();
+// Run syncPermissions method to generate permissions
+    $hasGenerate = \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::syncPermissions();
 
 ```
 
@@ -26,13 +27,40 @@ Before using the package, you need to install and configure spatie/laravel-permi
     $numPermissionsUpdated = \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::changeGuardWithPrefix('api-', 'api');
     
 ```
-### Instalation in Laravel
+
+### Seeder Example
+
+You can use a seeder to automatically generate permissions when seeding your database:
+
+```php
+use Illuminate\Database\Seeder;
+use Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate;
+
+class PermissionSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Generate permissions
+        SpatiePermissionGenerate::syncPermissions();
+    }
+}
+```
+
+### Installation in Laravel
 
 ``` php
 // Set the following keys in your `.env` file:
 
 SPG_CONTROLLERS_ROOT_PATH='app/Http/Controllers'
-SPG_IGNORE_CLASSES_FILES='Controller,Helper\Upload, Other classes you want ignore'
+SPG_IGNORE_CLASSES_FILES='Controller,Helper\Upload,Other classes you want to ignore'
 SPG_CONTROLLER_CLASSES_SUFFIX='Controller,_controller'
 SPG_IGNORE_METHODS_AND_FUNCTIONS='__construct'
 SPG_DEFAULT_GUARD='web'
