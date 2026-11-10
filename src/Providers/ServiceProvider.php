@@ -17,9 +17,14 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->publishes([
-            __DIR__ . '/../config/spatie-permission-generate.php' => config_path('spatie-permission-generate.php'),
-        ]);
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/spatie-permission-generate.php',
+            'spatie-permission-generate'
+        );
+
+        $this->app->bind(SpatiePermissionGenerate::class, function () {
+            return new SpatiePermissionGenerate();
+        });
     }
 
     /**
@@ -29,17 +34,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(
-            __DIR__ . '/../config/spatie-permission-generate.php',
-            'spatie-permission-generate'
-        );
-
-        $this->app->bind(SpatiePermissionGenerate::class, function ($app) {
-            $spg =  new \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate();
-
-
-
-            return $spg;
-        });
+        $this->publishes([
+            __DIR__ . '/../config/spatie-permission-generate.php' => config_path('spatie-permission-generate.php'),
+        ], 'spatie-permission-generate-config');
     }
 }

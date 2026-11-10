@@ -52,4 +52,25 @@ If the project maintainer has any additional requirements, you will find them li
 
 - **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please [squash them](https://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages) before submitting.
 
+## Releasing
+
+Composer resolves stable versions from Git tags. To publish a new release:
+
+1. Update `CHANGELOG.md`.
+2. Commit the changes.
+3. Create and push a tag:
+
+```bash
+git tag v1.1.0
+git push origin main --tags
+```
+
+The `Update Packagist` GitHub Action notifies Packagist on every push to `main`
+and on every `v*` tag, so `composer update` picks up the new version. The action
+requires the `PACKAGIST_USERNAME` and `PACKAGIST_API_TOKEN` repository secrets
+(your Packagist username and API token, available at https://packagist.org/profile/).
+
+You can also enable the Packagist GitHub webhook for the repository, which
+updates the package automatically on every push.
+
 **Happy coding**!

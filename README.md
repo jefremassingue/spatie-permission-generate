@@ -9,8 +9,11 @@ For instance, Admin\UserController with index method => will have the permission
 You can install the package via composer:
 
 ```bash
-composer require jefremassingue/spatie-permission-generate:"dev-main"
+composer require jefremassingue/spatie-permission-generate
 ```
+
+Composer will install the latest stable release. The package supports
+`spatie/laravel-permission` 4.2+, 5.x, 6.x, 7.x and 8.x.
 
 ## Usage
 
@@ -26,7 +29,13 @@ Before using the package, you need to install and configure spatie/laravel-permi
     $numPermissionsUpdated = \Jefre\SpatiePermissionGenerate\SpatiePermissionGenerate::changeGuardWithPrefix('api-', 'api');
     
 ```
-### Instalation in Laravel
+### Installation in Laravel
+
+Publish the configuration file (optional, the package works with its default configuration):
+
+``` bash
+php artisan vendor:publish --tag=spatie-permission-generate-config
+```
 
 ``` php
 // Set the following keys in your `.env` file:

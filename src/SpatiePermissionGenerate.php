@@ -59,7 +59,30 @@ class SpatiePermissionGenerate
     }
 
     /**
+     * Synchronize permissions for all controller classes and methods.
+     *
+     * @return bool True if synchronization was successful, false otherwise.
+     */
+    public static function synchronizePermission(): bool
+    {
+        return self::synchronizelPermission();
+    }
+
+    /**
      * Change the guard name for permissions with a given prefix.
+     *
+     * @param string $prefix The prefix of the permissions to be changed.
+     * @param string $guard  The new guard name.
+     *
+     * @return int The number of permissions that were updated.
+     */
+    public static function changeGuardWithPrefix($prefix = 'api-', $guard = 'api')
+    {
+        return Permission::where('name', 'like', $prefix . '%')->update(['guard_name' => $guard]);
+    }
+
+    /**
+     * @deprecated Use changeGuardWithPrefix() instead.
      *
      * @param string $prefix The prefix of the permissions to be changed.
      * @param string $guard  The new guard name.
@@ -68,7 +91,7 @@ class SpatiePermissionGenerate
      */
     public static function chanteGuardWithPrefix($prefix = 'api-', $guard = 'api')
     {
-        return Permission::where('name', 'like', $prefix . '%')->update(['guard_name' => $guard]);
+        return self::changeGuardWithPrefix($prefix, $guard);
     }
 
 
@@ -84,7 +107,9 @@ class SpatiePermissionGenerate
         $path = base_path(config('spatie-permission-generate.controllers_root_path'));
         $fqcns = array();
 
-        $allFiles = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
+        $allFiles = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)
+        );
         $phpFiles = new \RegexIterator($allFiles, '/\.php$/');
         foreach ($phpFiles as $phpFile) {
             $content = file_get_contents($phpFile->getRealPath());
@@ -131,12 +156,11 @@ class SpatiePermissionGenerate
         self::$controller_classes_suffixes = explode(",", config('spatie-permission-generate.controller_classes_suffixes')  ?? 'Controller');
         self::$default_guard =  config('spatie-permission-generate.default_guard');
 
+        $path = base_path(config('spatie-permission-generate.controllers_root_path'));
+        $path = explode('/', $path);
+        $path = $path[count($path) - 1];
+
         foreach (self::classList() as $class_item) {
-
-            $path = base_path(config('spatie-permission-generate.controllers_root_path'));
-            $path = explode('/', $path);
-            $path = $path[count($path) - 1];
-
 
             $class = explode($path . '\\', $class_item);
             $class = $class[count($class) - 1];
@@ -150,9 +174,9 @@ class SpatiePermissionGenerate
                         !in_array($method_name, self::$ignore_methods_and_functions) &&
                         substr($method_name, 0, 3) != "___" // Para egnorar methods que iniciam cm ___
                     ) {
-                        $class_name = '';
+                        $class_name = $class;
                         foreach (self::$controller_classes_suffixes as $suffix) {
-                            $class_name = str_replace($suffix, '', $class);
+                            $class_name = str_replace($suffix, '', $class_name);
                         }
 
                         $permission_name = strtolower(str_replace('\\', '-', $class_name . '-' . $method_name));
